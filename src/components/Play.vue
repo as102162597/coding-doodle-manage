@@ -96,19 +96,36 @@ const inputChanged = () => {
 }
 
 const trans = s => {
-  let tmp;
-  if (!s.length)
+  if (!s.length) {
     return '';
-  else if ([ 'L', 'R', 'F' ].includes(s[0]))
+  } else if ([ 'L', 'R', 'F' ].includes(s[0])) {
     return s[0] + trans(s.slice(1));
-  else if ([ 'L', 'R', 'F' ].includes(s.slice(-1)))
+  } else if ([ 'L', 'R', 'F' ].includes(s.slice(-1))) {
     return trans(s.slice(0, -1)) + s.slice(-1);
-  else if (s[0] === '(' && (tmp = s.match(/\)\*\d+$/)))
-    return trans(s.slice(1, -tmp[0].length)).repeat(parseInt(tmp[0].slice(2)));
-  else if (s.slice(-1) === ')' && (tmp = s.match(/^\d+\*\(/)))
-    return trans(s.slice(tmp[0].length, -1)).repeat(parseInt(tmp[0].slice(0, -2)));
-  else
+  } else if (s[0] === '(') {
+    let cnt = 1;
+    let i;
+    for (i = 1; i < s.length; i += 1) {
+      if (s[i] === '(')
+        cnt += 1;
+      else if (s[i] === ')')
+        cnt -= 1;
+
+      if (!cnt) {
+        if (s[i + 1] === '*') {
+          const ss = s.slice(i + 2).match(/^\d+/);
+          if (!ss)
+            throw new Error('invalid pattern');
+          return trans(s.slice(1, i)).repeat(parseInt(ss[0])) + trans(s.slice(i + 2 + s[0].length));
+        } else {
+          throw new Error('invalid pattern');
+        }
+      }
+    }
     throw new Error('invalid pattern');
+  } else {
+    throw new Error('invalid pattern');
+  }
 }
 
 const run = (s, i) => {
@@ -142,19 +159,30 @@ const run = (s, i) => {
 
 const clickPlayButton = () => {
   isRunning.value = true;
-  let s;
   try {
-    s = trans(inputValue.value.toUpperCase());
+    const s = trans(inputValue.value.toUpperCase());
+    setTimeout(() => run(s), gapTime);
   } catch (e) {
     alert('invalid answer.');
+    isRunning.value = false;
   }
-  setTimeout(() => run(s), gapTime);
+}
+
+const direction2Angle = direction => {
+  switch (direction) {
+    case Game.Direction.TOP:    return 0;
+    case Game.Direction.RIGHT:  return 90;
+    case Game.Direction.DOWN:   return 180;
+    case Game.Direction.LEFT:   return 270;
+    default:                    return 0;
+  }
 }
 
 onMounted(async () => {
   gObj = await fatchGame(new URLSearchParams(window.location.search).get('u'));
   game = new Game(gObj);
   update();
+  slimeFace.value = (direction2Angle(game.getSlime().direction));
   unitLen.value = setUnitLen(game.getRows(), game.getCols());
   height.value = game.getRows() * unitLen.value;
   width.value = game.getCols() * unitLen.value;
