@@ -8,8 +8,8 @@ const gapTime = 1000;
 
 const inputValue = ref('');
 const isRunning = ref(false);
-const width = ref(0);
 const height = ref(0);
+const width = ref(0);
 const unitLen = ref(30);
 const slimeFace = ref(0);
 const slime = reactive({});
@@ -75,7 +75,7 @@ const fatchGame = async uuid => {
 
 const setUnitLen = (row, col) => {
   const unitHeight = parseInt(mapHeight / row);
-  const unitWidth = parseInt(mapHeight / col);
+  const unitWidth = parseInt(mapWidth / col);
   return unitHeight < unitWidth ? unitHeight : unitWidth;
 }
 
