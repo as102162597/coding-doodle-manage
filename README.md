@@ -1,5 +1,5 @@
-**coding doodle**
-=================
+**coding doodle manage**
+========================
 Version: 1.0.0\
 Release date: 11/5/2024
 
