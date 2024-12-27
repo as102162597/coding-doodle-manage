@@ -116,7 +116,7 @@ const trans = s => {
           const ss = s.slice(i + 2).match(/^\d+/);
           if (!ss)
             throw new Error('invalid pattern');
-          return trans(s.slice(1, i)).repeat(parseInt(ss[0])) + trans(s.slice(i + 2 + s[0].length));
+          return trans(s.slice(1, i)).repeat(parseInt(ss[0])) + trans(s.slice(i + 2 + ss[0].length));
         } else {
           throw new Error('invalid pattern');
         }
